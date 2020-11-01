@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import Cell from "./Cell";
 import "./Board.css";
 
@@ -28,31 +28,30 @@ import "./Board.css";
  *
  **/
 
-class Board extends Component {
-  static defaultProps = {
+function Board (props) {
+
+  const init = {
     nrows: 5,
     ncols: 5,
     chanceLightStartsOn: 0.25
   };
-  constructor(props) {
-    super(props);
+  props=init;
 
-    // TODO: set initial state
-    this.state = {
-      hasWon: false,
-      board: this.createBoard()
-    };
-  }
+  const[state,setState]=useState({
+    hasWon: false,
+    board: createBoard()
+  })
+ 
 
   /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
 
-  createBoard() {
+  function createBoard() {
     let board = [];
     // TODO: create array-of-arrays of true/false values
-    for (let y = 0; y < this.props.nrows; y++) {
+    for (let y = 0; y < props.nrows; y++) {
       let row = [];
-      for (let x = 0; x < this.props.ncols; x++) {
-        row.push(Math.random() < this.props.chanceLightStartsOn);
+      for (let x = 0; x < props.ncols; x++) {
+        row.push(Math.random() < props.chanceLightStartsOn);
       }
       board.push(row);
     }
@@ -61,9 +60,9 @@ class Board extends Component {
 
   /** handle changing a cell: update board & determine if winner */
 
-  flipCellsAround(coord) {
-    let { ncols, nrows } = this.props;
-    let board = this.state.board;
+ function  flipCellsAround(coord) {
+    let { ncols, nrows } = props;
+    let board = state.board;
     let [y, x] = coord.split("-").map(Number);
 
     function flipCell(y, x) {
@@ -84,21 +83,21 @@ class Board extends Component {
     // TODO: determine is the game has been won
     let hasWon = board.every(row => row.every(cell => !cell));
 
-    this.setState({ board: board, hasWon: hasWon });
+    setState({ board: board, hasWon: hasWon });
   }
 
   /** Render game board or winning message. */
-  makeTable() {
+  function makeTable() {
     let tblBoard = [];
-    for (let y = 0; y < this.props.nrows; y++) {
+    for (let y = 0; y < props.nrows; y++) {
       let row = [];
-      for (let x = 0; x < this.props.ncols; x++) {
+      for (let x = 0; x < props.ncols; x++) {
         let coord = `${y}-${x}`;
         row.push(
           <Cell
             key={coord}
-            isLit={this.state.board[y][x]}
-            flipCellsAroundMe={() => this.flipCellsAround(coord)}
+            isLit={state.board[y][x]}
+            flipCellsAroundMe={() => flipCellsAround(coord)}
           />
         );
       }
@@ -110,10 +109,10 @@ class Board extends Component {
       </table>
     );
   }
-  render() {
+ 
     return (
       <div>
-        {this.state.hasWon ? (
+        {state.hasWon ? (
           <div className='winner'>
             <span className='neon-orange'>YOU</span>
             <span className='neon-blue'>WIN!</span>
@@ -124,12 +123,12 @@ class Board extends Component {
               <div className='neon-orange'>Lights</div>
               <div className='neon-blue'>Out</div>
             </div>
-            {this.makeTable()}
+            {makeTable()}
           </div>
         )}
       </div>
     );
-  }
+  
 }
 
 export default Board;
